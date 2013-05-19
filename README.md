@@ -19,9 +19,13 @@ This file contains the SNPs that you'd like to test the selection. The first col
 
 ## To run
 Just run: 
+	
 	perl 1_ave1.pl
+	
 	perl 2_null1.pl
+	
 	perl 3_candidate1.pl
+	
 	perl 4_pval1.pl
 
 Then, you find PHS_Pval.out that contains P-values of the PHS test. This file contains the statistics and P-values for both alleles at a SNP.
