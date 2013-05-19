@@ -1,5 +1,7 @@
 NOTE:  This version is preliminary (unpublished)!!  Please be careful!!
+
 NOTE:  Also read the comments on the scripts!!
+
 NOTE: If a focal SNP is monomorphic, this script calculates only the 
 		second term of equation (1) in Toomajan et al. (2006) PLoS B
 		This may not be a good way.
@@ -32,11 +34,3 @@ perl 4_pval1.pl
 
 Then, you find PHS_Pval.out that contains P-values of the PHS test.
 This file contains the statistics and P-values for both alleles at a SNP.
-
-
-shohei
-
-
-
-
-}
