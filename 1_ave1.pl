@@ -9,23 +9,14 @@ use BeginPerlBioinfo ;
 use evolve ;
 srand ( time|$$ ) ;
 
-# pairwide haplotype-sharing score
-# calculate d_ij and sigma_ij in equation (2) in Toomajian (2006) PLoSB
+# pairwide haplotype-sharing score (PHS)
+# calculate d_ij and sigma_ij in equation (2) in Toomajian et al. (2006) PLoSB
+
+# the order of individuals should be the same among chromosomes
 
 my (@fl) = glob ("./phased_SNPs/*") ;
 my ($n_fl) = scalar @fl ;
 print "# of input files = $n_fl\n\n" ;
-
-#my (@at) = qw (1 2 3 4 5 6 7 8 9 10) ;
-#my (@at) = qw (9 10) ;
-
-#my ($foc1) = $ARGV[0] ;
-#my ($foc1) = "Andean" ;
-#my ($foc1) = "Mex_Lowland" ;
-#my ($foc1) = "Mex_Highland" ;
-#my ($foc1) = "SA_Lowland" ;
-
-#print "$foc1\n" ;
 
 my ($openf) ;
 my (@dt1) = () ;
@@ -33,6 +24,7 @@ my (@dt1) = () ;
 my ($n_sam) = scalar &fileopen ("$fl[0]") ;
 print "# of samples = $n_sam\n\n" ;
 
+# set output array
 my (@res) = () ;
 my ($h) = 0 ;
 for ( my ($i)=0; $i < $n_sam-1; $i++ ){
@@ -47,8 +39,9 @@ for ( my ($i)=0; $i < $n_sam-1; $i++ ){
 foreach my $fl (@fl){
 	
 	# open phased SNP file
+	# A, T, G, C and N (missing data) are allowed
 	@dt1 = () ;
-	open (DAT, "$fl")|| die "pppp\n" ;
+	open (DAT, "$fl")|| die "$fl not found\n" ;
 	my ($i) = 0 ;
 	while ( $openf = <DAT> ){
 		chomp $openf ;
@@ -56,23 +49,24 @@ foreach my $fl (@fl){
 		$i++ ;
 	}
 	close (DAT) ;
-	my ($n_dt1) = scalar @dt1 ;
-	my ($c_dt1) = scalar @{$dt1[0]} ;
+	my ($n_dt1) = scalar @dt1 ; # Number of samples
+	my ($c_dt1) = scalar @{$dt1[0]} ; # Number of SNPs
 	print "  $fl, # of samples = $n_dt1, # of SNPs = $c_dt1\n" ;
 	&TwoDarrayTest2 (\@dt1) ;
 	if ( $n_sam != $n_dt1 ){print "Error\n# of samples are different among chromosomes $n_sam $n_dt1\n" ; exit ; }
 	
 	# open Genetic distance file
+	# 1st col: marker name
+	# 2nd col: cM 
 	my ($of_cm) = $fl ;
 	$of_cm =~ s/phased\_SNPs/cM/ ;
 	my (@dist) = &fileopen ("$of_cm") ;
-	@dist = &columnTab (\@dist, \2) ;
+	@dist = &columnTab (\@dist, \1) ;
 	my ($n_dist) = scalar @dist ;
 	print "  # of SNPs in genetic distance = $n_dist\n" ;
 	if ( $n_dist != $c_dt1 ){print "Error\n# of SNPs are different in SNP and genetic distance files, $n_dist $c_dt1\n" ; exit ; }
 	#print "  $dist[0] $dist[10] $dist[20] $dist[30] $dist[50]\n" ;
-	
-	
+		
 	# calculate d_ij
 	my ($h) = 0 ;	
 	for ( my ($i)=0; $i < $n_sam-1; $i++ ){
@@ -83,10 +77,22 @@ foreach my $fl (@fl){
 			my (@d) = () ;
 			my (@resT) = () ;
 			for ( my ($k)=0; $k < $c_dt1; $k++ ){
-				if ( $dt1[$i][$k] eq $dt1[$j][$k] ){
+
+				unless ( $dt1[$i][$k] =~ /[ATGCN]/ && $dt1[$j][$k] =~ /[ATGCN]/ ){
+					print "Error\nBad nucleotide: $dt1[$i][$k] $dt1[$j][$k].\nThe data should contain only ATGC or N\n" ; exit ;
+				}
+
+				if ( $dt1[$i][$k] eq "N" || $dt1[$j][$k] eq "N" ){
+					next ; 
+				}
+				elsif ( $dt1[$i][$k] eq $dt1[$j][$k] ){
 					push (@d, $dist[$k]) ;
 				}
-				else {
+				elsif ( $dt1[$i][$k] ne $dt1[$j][$k] || $k == ($c_dt1-1) ){
+					if ( $k == ($c_dt1-1) && $dt1[$i][$k] eq $dt1[$j][$k] ){
+						push (@d, $dist[$k]) ;
+					}
+				
 					my ($n_d) = scalar @d ;
 					if ( $n_d <= 1 ){}
 					else {
@@ -96,14 +102,7 @@ foreach my $fl (@fl){
 					@d = () ;
 				}
 			}
-			my ($n_d) = scalar @d ;
-			if ( $n_d <= 1 ){}                                 
-			else {
-				my ($distance) = &max (@d) - &min (@d) ;
-				push (@resT, $distance) ;
-			}
-
-
+			
 			#print "@resT\n" ; exit ;
 			@{$res[$h]} = (@{$res[$h]}, @resT) ;
 
@@ -116,7 +115,9 @@ foreach my $fl (@fl){
 	#last ; 
 } # @fl
 
-open (OUT, ">d_ij.out")|| die "ooooo\n" ;
+
+
+open (OUT, ">d_ij.out")|| die "can't open output file, d_ij.out\n" ;
 
 my ($h) = 0 ;
 for ( my ($i)=0; $i < $n_sam-1; $i++ ){
@@ -140,5 +141,10 @@ close (OUT) ;
 
 		
 exit ;
+
+
+
+
+
 
 
