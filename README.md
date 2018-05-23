@@ -1,4 +1,4 @@
-#PHS code
+# PHS code  
 
 Code for the PHS statistic from Toomajian et al. (2006) PLoS B, written by Shohei Takuno. This version is preliminary (unpublished), so caveat emptor! Also read the comments on the scripts. If a focal SNP is monomorphic, this script calculates only the second term of equation (1) in Toomajian et al. (2006) PLoS B. This may not be a good way.
 
