@@ -10,13 +10,13 @@ As an example, I used the SNP data of chromosome 9 and 10 in the Andean populati
 
 You need the phased data without missing data. The rows indicates individual haplotpes and the columns indicate SNPs. The file name should be chrX.out, where X is 1 - 10.
 
-###cM
+### cM  
 You need physical and genetic distance of all SNPs in phased-SNPs. In this file, the first column is SNP names, the second column is physical distance and the third column is genetic distance. The file name should be chrX.out, where X is 1 - 10. The number of SNPs in phased-SNPs and cM should be the same for every chromosome!!
 
 The original cM files weren't sufficient (only had snp name in column 1, genetic dist in column 2).
 I guessed at physical position by extracting it from their snp id (which wasn't always right, since some SNP names weren't position-based, to which I assigned a nearby value), and had to delete some of the candidate snps (file described in the next section) because they didn't have a matching physical position. -MCS
 
-###candidate_SNPs
+### candidate_SNPs  
 
 This file contains the SNPs that you'd like to test the selection. The first column is chromosome number and the second column is physical position. The file name should be chrX.out, where X is 1 - 10.
 
