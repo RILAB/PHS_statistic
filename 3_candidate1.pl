@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/env perl
 use strict ;
 #use lib "/Users/stakuno/perl/module" ;
 #use lib "/home/stakuno/module" ;
